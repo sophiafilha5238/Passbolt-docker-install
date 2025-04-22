@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  passbolt:
+    image: passbolt/passbolt:latest-ce
+    container_name: passbolt
+    restart: unless-stopped
+    environment:
+      APP_FULL_BASE_URL: https://seu-dominio.com.br
+      DATASOURCES_DEFAULT_HOST: mariadb
+      DATASOURCES_DEFAULT_USERNAME: passbolt
+      DATASOURCES_DEFAULT_PASSWORD: sua_senha_segura
+      DATASOURCES_DEFAULT_DATABASE: passboltdb
+      EMAIL_DEFAULT_FROM: seu_email@dominio.com.br
+      EMAIL_TRANSPORT_DEFAULT_HOST: smtp.gmail.com
+      EMAIL_TRANSPORT_DEFAULT_PORT: 587
+      EMAIL_TRANSPORT_DEFAULT_USERNAME: seu_servidor_email@dominio.com.br
+      EMAIL_TRANSPORT_DEFAULT_PASSWORD: senha_email_seguro
+      EMAIL_TRANSPORT_DEFAULT_TLS: true
+    volumes:
+      - ./gpg_volume:/etc/passbolt/gpg
+      - ./jwt_volume:/etc/passbolt/jwt
+    depends_on:
+      - mariadb
+    ports:
+      - "8080:80"
+
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_root
+      MYSQL_DATABASE: passboltdb
+      MYSQL_USER: passbolt
+      MYSQL_PASSWORD: sua_senha_segura
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+    networks:
+      - app_network
+    restart: always
+
+volumes:
+  mariadb_data:
+  gpg_volume:
+  jwt_volume:
+
+networks:
+  app_network:
+    external: true

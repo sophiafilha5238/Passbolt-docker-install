@@ -1,0 +1,4 @@
+# Evita versionar volumes e dados sensíveis
+mariadb_data/
+gpg_volume/
+jwt_volume/
